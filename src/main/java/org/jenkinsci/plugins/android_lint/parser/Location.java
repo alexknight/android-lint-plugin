@@ -1,6 +1,8 @@
 package org.jenkinsci.plugins.android_lint.parser;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Represents a location of a Lint issue. */
 public class Location implements Serializable {
@@ -10,6 +12,9 @@ public class Location implements Serializable {
     private String filename;
     private int lineNumber;
     private int column;
+
+    /** File(s) in which the issue was found. */
+    private final ArrayList<Location> locations = new ArrayList<Location>();
 
     /** @return The file name. */
     public String getFile() {
@@ -41,4 +46,14 @@ public class Location implements Serializable {
         this.column = column;
     }
 
+
+    /** @return List of locations the issue was found in. */
+    public List<Location> getLocations() {
+        return locations;
+    }
+
+    /** @param location Location to add to this issue. */
+    public void addLocation(final Location location) {
+        locations.add(location);
+    }
 }

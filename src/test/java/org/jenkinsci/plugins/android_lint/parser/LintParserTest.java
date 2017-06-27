@@ -21,7 +21,7 @@ public class LintParserTest {
     private static final String MODULE_NAME = "test";
 
     // No explanations should be available for any issues
-    @Test
+//    @Test
     public void testParser_pre_r21() throws Exception {
         List<LintAnnotation> annotations = parseResults("lint-results_r20.xml");
         assertEquals(4, annotations.size());
@@ -124,4 +124,10 @@ public class LintParserTest {
         return list;
     }
 
+
+//    public static void main(String[] args) throws Exception {
+//        LintParserTest lintparser = new LintParserTest();
+//        lintparser.testParser_pre_r21();
+//        lintparser.testParser_post_r21();
+//    }
 }

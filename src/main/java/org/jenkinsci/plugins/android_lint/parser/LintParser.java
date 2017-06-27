@@ -50,28 +50,99 @@ public class LintParser extends AbstractAnnotationParser {
             digester.setValidating(false);
             digester.setClassLoader(LintParser.class.getClassLoader());
 
-            List<LintIssue> issues = new ArrayList<LintIssue>();
+            List<EslintIssue> issues = new ArrayList<EslintIssue>();
             digester.push(issues);
 
-            String issueXPath = "issues/issue";
-            digester.addObjectCreate(issueXPath, LintIssue.class);
+            String issueXPath = "checkstyle/file/error";
+            digester.addObjectCreate(issueXPath, EslintIssue.class);
             digester.addSetProperties(issueXPath);
             digester.addSetNext(issueXPath, "add");
 
-            String locationXPath = issueXPath + "/location";
+            String locationXPath = "checkstyle/file";
             digester.addObjectCreate(locationXPath, Location.class);
             digester.addSetProperties(locationXPath);
             digester.addSetNext(locationXPath, "addLocation", Location.class.getName());
 
             digester.parse(file);
 
-            return convert(issues, moduleName);
+            return esconvert(issues, moduleName);
         } catch (IOException exception) {
             throw new InvocationTargetException(exception);
         } catch (SAXException exception) {
             throw new InvocationTargetException(exception);
         }
     }
+
+//    private Collection<FileAnnotation> esconvert(final List<EslintIssue> issues, final String moduleName) {
+//        ArrayList<FileAnnotation> annotations = new ArrayList<FileAnnotation>();
+//
+//        for (EslintIssue issue : issues) {
+//
+//            final int line;
+//            final int column;
+//            final Location[] locations = issue.getLocations().toArray(new Location[0]);
+//            final int locationCount = locations.length;
+//            if (locationCount == 0) {
+//                filename = FILENAME_UNKNOWN;
+//                lineNumber = 0;
+//            } else {
+//                // TODO: Ideally, we would expand relative paths (like ParserResult does later)
+//                filename = locations[0].getFile();
+//                lineNumber = locations[0].getLine();
+//            }
+//
+//
+//            line = issue.getLine();
+//
+//
+//            final Priority priority = getPriority(issue.getSeverity());
+//            String category = issue.getCategory();
+//            String explanation = StringEscapeUtils.escapeXml(issue.getExplanation());
+//
+//            // If category is missing the file is from pre-r21 Lint, so show an explanation
+//            if (category == null) {
+//                category = Messages.AndroidLint_Parser_UnknownCategory();
+//                explanation = Messages.AndroidLint_Parser_UnknownExplanation(issue.getId());
+//            }
+//
+//            // Create annotation
+//            LintAnnotation annotation = new LintAnnotation(priority, issue.getMessage(),
+//                    category, issue.getId(), lineNumber);
+//            annotation.setExplanation(explanation);
+//            annotation.setErrorLines(StringEscapeUtils.escapeXml(issue.getErrorLine1()),
+//                    StringEscapeUtils.escapeXml(issue.getErrorLine2()));
+//            annotation.setModuleName(moduleName);
+//            annotation.setFileName(filename);
+//
+//            // Generate a hash to uniquely identify this issue and its context (i.e. source code),
+//            // so that we can detect in later builds whether this issue still exists, or was fixed
+//            if (lineNumber == 0) {
+//                // This issue is for a non-source file, so use the issue type and filename
+//                int hashcode = String.format("%s:%s", filename, issue.getId()).hashCode();
+//                annotation.setContextHashCode(hashcode);
+//            } else {
+//                // This is a source file (i.e. Java or XML), so use a few lines of context
+//                // surrounding the line on which the issue first occurs, so that we can detect
+//                // whether this issue still exists later, even if the line numbers have changed
+//                try {
+//                    annotation.setContextHashCode(createContextHashCode(filename, lineNumber));
+//                } catch (IOException e) {
+//                    // Filename is probably not relative to the workspace root, so we can't read out
+//                    // the surrounding context of this issue. Nothing we can do about this
+//                }
+//            }
+//
+//            // Add additional locations for this the issue, if any
+//            for (int i = 1, n = locationCount; i < n; i++) {
+//                annotation.addLocation(locations[i]);
+//            }
+//
+//            annotations.add(annotation);
+//        }
+//
+//        return annotations;
+//    }
+
 
     /**
      * Converts the Lint object structure to that of the analysis-core API.
